@@ -1,0 +1,293 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include<string.h>
+#define MAX 70
+
+struct node{
+    char data;
+    struct node *link;
+};
+
+struct node *top=NULL;
+char operation[MAX];
+char answer[MAX];
+char prefix[MAX];
+int elem=0;
+
+char A = '+';
+char S = '-';
+char M = '*';
+char D = '/';
+char E = '^';
+char BO= '(';
+char BC= ')';
+char a='N';
+
+void push(char data){
+    struct node *current = top;
+    struct node *newnode=malloc(sizeof(struct node));
+    newnode -> data = data;
+    newnode->link=top;
+    top=newnode;
+}
+
+char pop(){
+    struct node *newtop=top->link;
+    char a = top->data;
+    free(top);
+    top=newtop;
+    return a;
+}
+
+char peek(){
+    if (top==NULL){
+        return a;
+    }
+    else{
+    return top->data;
+    }
+}
+
+int priority(char symbol){
+    if (symbol==A || symbol==S){
+        return 1;
+    }
+    if (symbol==M || symbol==D){
+        return 2;
+    }
+    if (symbol==E){
+        return 3;
+    }
+    if (symbol==a){
+        return -1;
+    }
+}
+
+void infix_to_postfix(char operation[]){
+    int x=0;
+    while(operation[x]!=NULL){
+        if (operation[x] != A && operation[x] != S && operation[x] != M && operation[x] != D && operation[x] != E && operation[x] != BO &&  operation[x] != BC){
+            answer[elem]=operation[x];
+            elem++;
+        }
+        else if (operation[x]==BO){
+            push(operation[x]);
+        }
+        else if (operation[x]==BC){
+            char y = pop();
+            do{
+                answer[elem]=y;
+                elem++;
+                y=pop();
+            }while(y!=BO);
+        }
+        else{
+            if (peek()==a){
+                push(operation[x]);
+            }
+            else
+            {
+            char y = peek();
+            while(priority(operation[x])<=priority(peek()) && peek()!=BO){
+                answer[elem]=peek();
+                elem++;
+                y=pop();
+            }
+            push(operation[x]);
+            }
+        }
+        x++;
+    }
+    while(top!=NULL){
+        char y=pop();
+        answer[elem]=y;
+        elem++;
+    }
+    
+}
+
+void infix_to_prefix(char operation[]){
+    char infix_rev[MAX];
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    char temp;
+    for (int j=0; operation[j]!=NULL; j++){
+        i++;
+    }
+    k=i;
+    for (i=i-1, j; i>=0; i--,j++){
+        infix_rev[j]=operation[i];
+    }
+    infix_rev[j]=NULL;
+    for(int i = 0; infix_rev[i]!=NULL; i++){
+        if (infix_rev[i]==BO){
+            infix_rev[i]=BC;
+        }
+        else if(infix_rev[i]==BC){
+            infix_rev[i]=BO;
+        }
+    }
+    printf("string reversed: ");
+    for(int i=0; infix_rev[i]!=NULL; i++){
+        printf("%c", infix_rev[i]);
+    }
+    infix_to_postfix(infix_rev);
+    printf("\nconverted to postfix: ");
+    for(i=0; answer[i]!=NULL; i++){
+        printf("%c", answer[i]);
+    }
+    for(int j=0, k=i-1; k>=0; j++, k--){
+        prefix[j]=answer[k];
+    }
+    prefix[j]=NULL;
+    printf("\nprefix expression: ");
+    for(int i=0; prefix[i]!=NULL; i++){
+        printf("%c", prefix[i]);
+    }
+}
+
+
+
+
+int main(){
+    printf("Enter operation: ");
+    gets(operation);
+    //infix_to_prefix(operation);
+    // infix_to_postfix(operation);
+    // printf("\n");
+    // for(int i=0; answer[i]!=NULL; i++){
+    //     printf("%c", answer[i]);
+    // }
+}
+
+
+
+//POSTFIX AND PREFIX EVALUATION
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#define MAX 50
+
+
+struct node{
+    int data;
+    struct node *link;
+};
+
+struct node *top=NULL;
+char expression[MAX];
+char reversed[MAX];
+char a='N';
+void push(char data){
+    struct node *current = top;
+    struct node *newnode=malloc(sizeof(struct node));
+    newnode -> data = data;
+    newnode->link=top;
+    top=newnode;
+}
+
+char pop(){
+    struct node *newtop=top->link;
+    char a = top->data;
+    free(top);
+    top=newtop;
+    return a;
+}
+
+char peek(){
+    if (top==NULL){
+        return a;
+    }
+    else{
+    return top->data;
+    }
+}
+
+int evaluate(int OP1, int OP2, char O){
+char A = '+';
+char S = '-';
+char M = '*';
+char D = '/';
+char E = '^';
+if (O==A){
+    return OP1+OP2;
+}
+if (O==S){
+    return OP1-OP2;
+}
+if (O==M){
+    return OP1*OP2;
+}
+if (O==D){
+    return OP1/OP2;
+}
+if (O==E){
+    return pow(OP1, OP2);
+}
+
+}
+
+int postfix_eval(){
+    char x;
+    int i=0;
+    printf("Enter Expression: ");
+    while((x=getchar())!='\n'){
+        expression[i]=x;
+        if (isdigit(x)){
+            int num=x-48;
+            push(num);
+        }
+        else{
+            int OP2=pop();
+            int OP1=pop();
+            int val = evaluate(OP1, OP2, x);
+            push(val);
+        }
+        i++;
+    }
+    int val=pop();
+    printf("Answer: %d\n", val);
+    prefix_eval();
+}
+
+
+int prefix_eval(){
+    printf("Enter Expression: ");
+    gets(expression);
+    int k=0;
+    int j=0;
+    for(int j=0; expression[j]!=NULL; j++){
+        k++;
+    }
+    for (j, k=k-1; k>=0; k--, j++){
+        reversed[j]=expression[k];
+    }
+    reversed[j]=NULL;
+    
+    char x;
+    int i=0;
+    while((x=reversed[i])!=NULL){
+        if (isdigit(x)){
+            int num=x-48;
+            push(num);
+        }
+        else{
+            int OP1=pop();
+            int OP2=pop();
+            int val = evaluate(OP1, OP2, x);
+            push(val);
+        }
+        i++;
+    }
+    int val=pop();
+    printf("Answer: %d\n", val);
+}
+
+int main()
+{
+    // postfix_eval();
+    // prefix_eval();
+}
