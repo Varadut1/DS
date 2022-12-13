@@ -1,0 +1,184 @@
+#include <stdio.h>
+#include <stdlib.h>
+int n;
+
+struct node {
+    int vertex;
+    struct node *next;
+};
+
+int queue[10];
+int front=-1;
+int rear=0;
+int stack[10];
+int stacktop=-1;
+void push(int data){
+    stacktop++;
+    stack[stacktop]=data;
+}
+int pops()
+{
+    int temp=stack[stacktop];
+    stacktop--;
+    return temp;
+}
+int sisempty(){
+    if (stacktop==-1){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+void enqueue(int data){
+    queue[rear]=data;
+    rear++;
+    if (front==-1){
+        front+=1;
+    }
+}
+int pop(){
+    
+    int temp = queue[front];
+    front+=1;
+    return temp;
+}
+
+int empty_queue(){
+    if (front==rear||front == -1){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+} 
+
+void display(){
+    for (int i=front; i<rear; i++){
+        printf("%d ", queue[i]);
+    }
+}
+
+struct node *A[10];
+
+void init(int n){
+    
+    for(int i=0; i<n;i++){
+        A[i]=NULL;
+    }
+    printf("Initialized successfully");
+}
+
+void create(){
+    struct node *new=malloc(sizeof(struct node));
+    struct node *P;
+    char ch;
+    int v1, v2;
+    do{
+        printf("\nEnter vertex1: ");
+        scanf("%d", &v1);
+        printf("\nEnter vertex2: ");
+        scanf("%d", &v2);
+        printf("here");
+        new->vertex=v2;
+        P=A[v1];
+        printf("%p", P);
+        if (P==NULL){
+            A[v1]=new;
+        }
+        else{
+            while(P->next!=NULL)
+                {
+                    P=P->next;
+                }
+            P->next = new;
+        }   
+        printf("heredone");
+        
+        struct node *new=malloc(sizeof(struct node));
+        
+        new->vertex=v1;
+        P=A[v2];
+        if (P==NULL){
+            A[v2]=new;
+        }
+        else{
+            while(P->next!=NULL){
+                P=P->next;
+            }
+            P->next=new;
+        }
+        
+        printf("More edges (Y/N): ");
+        scanf("%s", &ch);
+    }while(ch=='y'||ch=='Y');
+}
+
+
+void BFS(int n){
+    int visited[10], v; 
+    struct node *p;
+    for(v=1; v<=n; v++){
+        visited[v]=0;
+    }
+    printf("Enter start vertex: ");
+    scanf("%d", &v);
+    enqueue(v);
+    visited[v]=1;
+    while(empty_queue()==0){
+        v=pop();
+        printf("%d ", v);
+        p=A[v];
+        while(p!=NULL){
+            if(visited[p->vertex]==0){
+                enqueue(p->vertex);
+                visited[p->vertex]=1;
+            }
+            p=p->next;
+        }
+    }
+    
+}
+void DFS(int n){
+    struct node *p;
+    int v, visited[10], f;
+    for (v=1; v<n; v++){
+        visited[v]=0;
+    }
+    printf("Enter start vertex: ");
+    scanf("%d", &v);
+    visited[v]=1;
+    printf(" %d", v);
+    push(v);
+    
+    do{
+        p=A[v];
+        while(p!=NULL){
+            if(visited[p->vertex]==0){
+                visited[p->vertex]=1;
+                printf(" %d", p->vertex);
+                v=p->vertex;
+                break;
+            }
+            else{
+                p=p->next;
+            }
+        }
+        if(p==NULL){
+            f=pops();
+            if (sisempty()==0){
+                v=stack[stacktop];
+            }
+        }
+    }while(sisempty()==0);
+}
+
+int main(){
+    
+    printf("Enter number of vertices: ");
+    scanf("%d", &n);
+    init(n);
+    create();
+    BFS(n);
+    DFS(n);
+}
